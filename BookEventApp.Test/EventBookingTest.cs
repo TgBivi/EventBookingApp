@@ -1,30 +1,23 @@
-﻿using Core.Context;
-using Core.Models;
-using Core.ViewModels;
+﻿using Core.ViewModels;
 using Logic.Interfaces;
-using Logic.Services;
-using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Assert = NUnit.Framework.Assert;
 
-namespace Logic.UnitTests
+namespace BookEventApp.Test
 {
-
     [TestFixture]
-    public class BookingServiceTests
+    public class EventBookingTest
     {
         private Mock<IEventService> _mockEventService;
         private IEventService _bookingService; // Assuming you have a BookingService
 
-        [SetUp]
-        public void Setup()
+       
+        public EventBookingTest( IEventService bookingService)
         {
             _mockEventService = new Mock<IEventService>();
+           // _mockEventService = mockEventService;
+            _bookingService = bookingService;
             // Initialize your BookingService here, potentially injecting the mock EventService
             // _bookingService = new EventService(_mockEventService.Object,new BookEventDbContext());
         }
@@ -86,10 +79,9 @@ namespace Logic.UnitTests
 
             // Assert
             Assert.That(bookingResult);
-            
+
             _mockEventService.Verify(service => service.SaveEventBooking(It.IsAny<BookEventViewModel>()), Times.Never);
         }
 
     }
-    
 }
