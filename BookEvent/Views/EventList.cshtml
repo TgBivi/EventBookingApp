@@ -1,0 +1,35 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Core.Models;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = "master.cshtml";
+}
+
+@{
+	var selection = Umbraco.Content(Guid.Parse("baad00ff-c02c-40f1-b0d4-c0e4f310a593"))
+    .Children()
+    .Where(x => x.IsVisible())
+    .OrderByDescending(x => x.CreateDate);
+}
+<div class="container mt-3"style="min-height: 300px;">
+    <ul style="list-style:none" class="row">
+        @foreach (var item in selection)
+        {
+
+            <a href="@item.Url()" class="card-link-wrapper mx-2" style="text-decoration:none">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+
+                        <h5 class="card-title">Title: <b>@item.Name</b></h5>
+                        <p class="card-text">Location: <b>@item.Value("venue")</b></p>
+                        <p class="card-text">Capacity: <b>@item.Value("capacity")</b></p>
+                        <p class="card-text">Date: <b>@item.Value("eventDate")</b></p>
+
+                        @* We don't need the button anymore as the whole card is clickable *@
+                    </div>
+                </div>
+            </a>
+        }
+    </ul>
+</div>
+

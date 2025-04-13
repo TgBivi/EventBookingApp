@@ -1,0 +1,34 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Core.Models
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Event>
+@{
+	Layout = "master.cshtml";
+}
+
+@if (TempData["Success"] != null)
+{
+	<div class="alert alert-success">
+		@TempData["Success"]
+	</div>
+}
+<div class="container mt-3"style="min-height: 300px;">
+
+
+	<div class="card col-8 m-auto shadow-lg" style="min-height: 250px;">
+		<div class="card-body">
+
+			<h5 class="card-title">Title: <b>@Model?.Name</b></h5>
+			<p class="card-text">Location: <b>@Model?.Value("venue")</b></p>
+			<p class="card-text">Date: <b>@Model?.EventDate.ToString("dd/MM/yyyy")</b></p>
+			<p class="card-text">Capacity: <b>@Model?.Capacity</b></p>
+			<p class="card-text">Detail: <b>@Model?.Details</b></p>
+
+			@* We don't need the button anymore as the whole card is clickable *@
+		</div>
+		<div class="pb-2 text-center">
+			<a href="@Url.Action("Book", "Event", new { id = Model.Id })" class="btn btn-primary">Book a spot</a>
+		</div>
+	</div>
+
+
+</div>
