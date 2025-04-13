@@ -22,11 +22,10 @@ A scalable website built with Umbraco CMS 15, leveraging .NET 9 and EF 9.0 for r
 
 3. **Configure SQLite**
    Update the `Program.cs` file with your SQLite connection string and Db context class:
-   ```c#
+   `
   builder.Services.AddDbContext<BookEventDbContext>(options =>
             options.UseSqlite(@"Data Source=C:\Temp\EventPlan.sqlite.db"));
-
-   ```
+`
 
 4. **Build and Run**
    ```bash
