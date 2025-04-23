@@ -50,8 +50,9 @@ namespace Logic.Services
             {
                 if (eventId <= 0) return 0;
 
-                return _dbContext.BookedEvents.Where(x => x.EventId == eventId).Count();
+                var result = _dbContext.BookedEvents.Where(x => x.EventId == eventId).ToList();
 
+                return result.Count;
             }
             catch (Exception ex)
             {
@@ -100,23 +101,6 @@ namespace Logic.Services
             }
         }
 
-        //public async Task<int> GetEventCapacity(int eventId)
-        //{
-        //    try
-        //    {
-        //        if (eventId <= 0) return 0;
-
-        //        var getEvent = await _dbContext.BookedEvents.FirstOrDefaultAsync(x => x.EventId == eventId);
-        //        if (getEvent == null) return 0;
-
-        //        return getEvent.c
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //        throw ex;
-        //    }
-        //}
 
     }
 }

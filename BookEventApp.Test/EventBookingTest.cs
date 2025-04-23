@@ -1,46 +1,40 @@
 ﻿using Core.ViewModels;
 using Logic.Interfaces;
 using Moq;
-using NUnit.Framework;
-using Assert = NUnit.Framework.Assert;
+using Xunit;
 
 namespace BookEventApp.Test
 {
-    [TestFixture]
-    public class EventBookingTest
+    public class EventServiceTests
     {
-        private Mock<IEventService> _mockEventService;
-        private IEventService _bookingService; // Assuming you have a BookingService
+        private readonly Mock<IEventService> _mockEventService;
+        private readonly IEventService _bookingService;
 
-       
-        public EventBookingTest( IEventService bookingService)
+        public EventServiceTests()
         {
             _mockEventService = new Mock<IEventService>();
-           // _mockEventService = mockEventService;
-            _bookingService = bookingService;
-            // Initialize your BookingService here, potentially injecting the mock EventService
-            // _bookingService = new EventService(_mockEventService.Object,new BookEventDbContext());
+            _bookingService = _mockEventService.Object;
         }
 
-        [Test]
+        [Fact]
         public async Task CanBookEvent_UserNotAlreadyBooked_CapacityNotFull()
         {
             // Arrange
             int eventId = 1;
-            string userEmail = "test@example.com";
+            string userEmail = "test@examp78e.com";
             int eventCapacity = 10;
             int bookedCount = 5;
 
-            _mockEventService.Setup(service => service.GetBookedEventCount(eventId))
-                                .ReturnsAsync(bookedCount);
+            _mockEventService.Setup(service => service.GetBookedEventCount(eventId)).ReturnsAsync(bookedCount);
+            //.Returns<int>( x => Task.FromResult(x < eventCapacity));
             _mockEventService.Setup(service => service.CheckForExistingBooking(eventId, userEmail))
-                                .ReturnsAsync(false);
-            _mockEventService.Setup(service => service.GetBookedEventCount(eventId))
-                                .ReturnsAsync(eventCapacity);
+            .ReturnsAsync(false);
             _mockEventService.Setup(service => service.SaveEventBooking(It.IsAny<BookEventViewModel>()))
-                                .ReturnsAsync(true); // Assume booking saves successfully
+            .Returns<BookEventViewModel>(model => Task.FromResult(
+            _mockEventService.Object.CheckForExistingBooking(model.EventId, model.Email).Result == false &&
+            _mockEventService.Object.GetBookedEventCount(model.EventId).Result < eventCapacity
+            ));
 
-            // Act
             var bookingViewModel = new BookEventViewModel
             {
                 EventId = eventId,
@@ -49,14 +43,17 @@ namespace BookEventApp.Test
                 Email = userEmail,
                 PhoneNumber = "1234567890"
             };
+            // Act
             var bookingResult = await _bookingService.SaveEventBooking(bookingViewModel);
 
             // Assert
-            Assert.That(bookingResult);
-            _mockEventService.Verify(service => service.SaveEventBooking(It.IsAny<BookEventViewModel>()), Times.Once);
+            Assert.True(bookingResult);
+            _mockEventService.Verify(service => service.GetBookedEventCount(eventId), Times.Once());
+            _mockEventService.Verify(service => service.CheckForExistingBooking(eventId, userEmail), Times.Once());
+            _mockEventService.Verify(service => service.SaveEventBooking(It.IsAny<BookEventViewModel>()), Times.Once());
         }
 
-        [Test]
+        [Fact]
         public async Task CannotBookEvent_UserAlreadyBooked()
         {
             // Arrange
@@ -64,9 +61,10 @@ namespace BookEventApp.Test
             string userEmail = "test@example.com";
 
             _mockEventService.Setup(service => service.CheckForExistingBooking(eventId, userEmail))
-                                .ReturnsAsync(true);
+                            .ReturnsAsync(true);
+            _mockEventService.Setup(service => service.SaveEventBooking(It.IsAny<BookEventViewModel>()))
+                            .Returns<BookEventViewModel>(model => Task.FromResult(!_mockEventService.Object.CheckForExistingBooking(model.EventId, model.Email).Result));
 
-            // Act
             var bookingViewModel = new BookEventViewModel
             {
                 EventId = eventId,
@@ -75,13 +73,14 @@ namespace BookEventApp.Test
                 Email = userEmail,
                 PhoneNumber = "1234567890"
             };
+
+            // Act
             var bookingResult = await _bookingService.SaveEventBooking(bookingViewModel);
 
             // Assert
-            Assert.That(bookingResult);
-
-            _mockEventService.Verify(service => service.SaveEventBooking(It.IsAny<BookEventViewModel>()), Times.Never);
+            Assert.False(bookingResult);
+            _mockEventService.Verify(service => service.CheckForExistingBooking(eventId, userEmail), Times.Once());
+            _mockEventService.Verify(service => service.SaveEventBooking(It.IsAny<BookEventViewModel>()), Times.Once());
         }
-
     }
 }

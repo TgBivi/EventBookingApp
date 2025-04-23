@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
-AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(builder.Environment.ContentRootPath, "umbraco\\Data"));        
+//AppDomain.CurrentDomain.SetData("DataDirectory", Path.Combine(builder.Environment.ContentRootPath, "umbraco\\Data"));        
 builder.Services.AddDbContext<BookEventDbContext>(options =>
             options.UseSqlite(@"Data Source=C:\Temp\EventPlan.sqlite.db"));
 
